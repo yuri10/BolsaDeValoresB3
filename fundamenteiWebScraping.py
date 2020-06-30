@@ -61,7 +61,7 @@ codigos = empresas['Ticker']
 
 #options of web driver
 options = webdriver.ChromeOptions()
-options.add_argument("--start-maximized")
+options.add_argument("--start-maximized") #alguns sites mudam o layout(elementos) quando não estão maximizados
 #actions = ActionChains(driver)
 driver = webdriver.Chrome("C:/chromedriver.exe", chrome_options = options)
 
@@ -74,8 +74,11 @@ email = 'oliveirayuri10@hotmail.com'
 password = input("Digite sua senha do fundamentei.com: ")
 login(email, password)
 
+
+
+
 #espera a pagina carregar depois de fazer o login
-ativos_path = '#__next > div.css-1gmso8b > nav > div.css-fmng4b > ul > li.css-1h66nt4 > a'
+ativos_path = '#__next > div.sticky-outer-wrapper > div > div > div > nav > div.css-fmng4b > ul > li.css-1h66nt4 > a'
 try:
     WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ativos_path)))
     print ("site carregou com sucesso!")
@@ -87,6 +90,38 @@ codigo = codigos[0]
 codigos = codigos[0:5]
 
 dataframes = [] 
+
+driver.get('https://fundamentei.com/br/hype')
+
+dados = []
+
+#nome da empresa
+nome_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-ebshsj > div > span.css-1olkw19'
+nome_element = driver.find_element_by_css_selector(nome_path)
+dados.append(nome_element.text)
+
+#Data de fundacao da empresa
+fundacao_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-1yuhvjn > div > div:nth-child(1) > div.css-17maft'
+fundacao_element = driver.find_element_by_css_selector(fundacao_path)
+dados.append(fundacao_element.text)
+
+#Localizacao da Sede da empresa
+sede_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(3) > div.css-17maft'
+sede_element = driver.find_element_by_css_selector(sede_path)
+dados.append(sede_element.text)
+
+#Escriturador
+escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
+escriturador_element = driver.find_element_by_css_selector(escriturador_path)
+dados.append(escriturador_element.text)
+
+#Setor
+escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
+escriturador_element = driver.find_element_by_css_selector(escriturador_path)
+dados.append(escriturador_element.text)
+
+
+'''
 
 #raspa cada site para cada codigo
 for codigo in codigos:
@@ -117,7 +152,7 @@ for codigo in codigos:
         
         
     except:
-        print("A pagina com codigo " + codigo +" nao possui tabelas!")
+        print("A pagina com codigo " + codigo + " nao possui tabelas!")
         
 #pega apenas os dataframes com o numero de colunas igual a 18 (senão da ruim na hora de unir os dfs)
 #list comprehension é uma delicinha
@@ -130,11 +165,11 @@ for i in range(1, len(dfs)):
 
 #tratamento dos dados
 #numeros no padrão brasileiro, vamos trocar para o americano/internacional
-df_teste=df_result.astype(int)
+#df_teste=df_result.astype(int)
 df_teste = df_teste.replace('.','',regex=False)    
 
 #salva o dataframe final em um arquivo .csv que será lido pelo Tableau
 df_result.to_csv('C:/Users/Yuri Oliveira/Desktop/BolsaDeValoresB3/resultado.csv')
 
-
+'''
 
