@@ -6,14 +6,14 @@ Created on Mon May 25 17:51:35 2020
 """
 
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.common.keys import Keys
 import pandas as pd
-from selenium.webdriver.support.ui import Select
+#from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-import time
+#import time
 #from selenium.webdriver.common.action_chains import ActionChains
 
 def login(email, password):
@@ -54,7 +54,7 @@ def login(email, password):
     
 #Armazena os codigos das empresas numa lista que sera usada para acessar o site
 # e obter mais dados sobre a empresa
-empresas = pd.read_csv('C:/Users/Yuri Oliveira/Desktop/BolsaDeValoresB3/fundamentei.csv')
+empresas = pd.read_csv('C:/Users/olive/Desktop/BolsaDeValoresB3/fundamentei.csv')
 
 #pega apenas a coluna com os codigos das empresas
 codigos = empresas['Ticker']
@@ -95,30 +95,49 @@ driver.get('https://fundamentei.com/br/hype')
 
 dados = []
 
+def retornaTextoDoElemento(elemento_path):
+    elemento = driver.find_element_by_css_selector(elemento_path)
+    return elemento.text    
+
 #nome da empresa
 nome_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-ebshsj > div > span.css-1olkw19'
-nome_element = driver.find_element_by_css_selector(nome_path)
-dados.append(nome_element.text)
+nome = retornaTextoDoElemento(nome_path)
+dados.append(nome)
 
 #Data de fundacao da empresa
 fundacao_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-1yuhvjn > div > div:nth-child(1) > div.css-17maft'
-fundacao_element = driver.find_element_by_css_selector(fundacao_path)
-dados.append(fundacao_element.text)
+fundacao = retornaTextoDoElemento(fundacao_path)
+dados.append(fundacao)
 
 #Localizacao da Sede da empresa
 sede_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(3) > div.css-17maft'
-sede_element = driver.find_element_by_css_selector(sede_path)
-dados.append(sede_element.text)
+sede = retornaTextoDoElemento(sede_path)
+dados.append(sede)
 
 #Escriturador
 escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
-escriturador_element = driver.find_element_by_css_selector(escriturador_path)
-dados.append(escriturador_element.text)
+escriturador = retornaTextoDoElemento(escriturador_path)
+dados.append(escriturador)
 
 #Setor
-escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
-escriturador_element = driver.find_element_by_css_selector(escriturador_path)
-dados.append(escriturador_element.text)
+setor_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(5) > div.css-17maft > a'
+setor = retornaTextoDoElemento(setor_path)
+dados.append(setor)
+
+#Caracteristicas da empresa
+caracteristicas_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(6) > div.css-1r1xctr'
+caracteristicas = retornaTextoDoElemento(caracteristicas_path)
+dados.append(caracteristicas)
+
+#Avaliacao reclameAqui
+reclameAqui_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(1) > div > div.css-164r41r > div > span.css-1dtjftk'
+reclameAqui = retornaTextoDoElemento(reclameAqui_path)
+dados.append(reclameAqui)
+
+#Avaliacao funcionarios Glassdoor
+avalFunc_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(2) > div > div > div.css-164r41r > span'
+avalFunc = retornaTextoDoElemento(avalFunc_path)
+dados.append(avalFunc)
 
 
 '''
