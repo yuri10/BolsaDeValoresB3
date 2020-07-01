@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-#import time
+import time
 #from selenium.webdriver.common.action_chains import ActionChains
 
 def login(email, password):
@@ -85,62 +85,70 @@ try:
 except TimeoutException:
     print ("o site demorou muito para carregar, rode o programa novamente!")
     
-#variaveis de teste
-codigo = codigos[0]
-codigos = codigos[0:5]
-
-dataframes = [] 
 
 driver.get('https://fundamentei.com/br/hype')
 
-dados = []
 
 def retornaTextoDoElemento(elemento_path):
     elemento = driver.find_element_by_css_selector(elemento_path)
     return elemento.text    
 
-#nome da empresa
-nome_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-ebshsj > div > span.css-1olkw19'
-nome = retornaTextoDoElemento(nome_path)
-dados.append(nome)
-
-#Data de fundacao da empresa
-fundacao_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-1yuhvjn > div > div:nth-child(1) > div.css-17maft'
-fundacao = retornaTextoDoElemento(fundacao_path)
-dados.append(fundacao)
-
-#Localizacao da Sede da empresa
-sede_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(3) > div.css-17maft'
-sede = retornaTextoDoElemento(sede_path)
-dados.append(sede)
-
-#Escriturador
-escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
-escriturador = retornaTextoDoElemento(escriturador_path)
-dados.append(escriturador)
-
-#Setor
-setor_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(5) > div.css-17maft > a'
-setor = retornaTextoDoElemento(setor_path)
-dados.append(setor)
-
-#Caracteristicas da empresa
-caracteristicas_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(6) > div.css-1r1xctr'
-caracteristicas = retornaTextoDoElemento(caracteristicas_path)
-dados.append(caracteristicas)
-
-#Avaliacao reclameAqui
-reclameAqui_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(1) > div > div.css-164r41r > div > span.css-1dtjftk'
-reclameAqui = retornaTextoDoElemento(reclameAqui_path)
-dados.append(reclameAqui)
-
-#Avaliacao funcionarios Glassdoor
-avalFunc_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(2) > div > div > div.css-164r41r > span'
-avalFunc = retornaTextoDoElemento(avalFunc_path)
-dados.append(avalFunc)
-
-
-'''
+def coletaDadosDaEmpresa():
+    
+    dados = [] #lista que sera preenchida com os dados que nao estao na tabela
+    
+    #nome da empresa
+    nome_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-ebshsj > div > span.css-1olkw19'
+    nome = retornaTextoDoElemento(nome_path)
+    dados.append(nome)
+    
+    #Data de fundacao da empresa
+    fundacao_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-1yuhvjn > div > div:nth-child(1) > div.css-17maft'
+    fundacao = retornaTextoDoElemento(fundacao_path)
+    dados.append(fundacao)
+    
+    #Localizacao da Sede da empresa
+    sede_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(3) > div.css-17maft'
+    sede = retornaTextoDoElemento(sede_path)
+    dados.append(sede)
+    
+    #Escriturador
+    escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
+    escriturador = retornaTextoDoElemento(escriturador_path)
+    dados.append(escriturador)
+    
+    #Setor
+    setor_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(5) > div.css-17maft > a'
+    setor = retornaTextoDoElemento(setor_path)
+    dados.append(setor)
+    
+    #Caracteristicas da empresa
+    caracteristicas_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(6) > div.css-1r1xctr'
+    caracteristicas = retornaTextoDoElemento(caracteristicas_path)
+    dados.append(caracteristicas)
+    
+    #Avaliacao reclameAqui
+    reclameAqui_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(1) > div > div.css-164r41r > div > span.css-1dtjftk'
+    reclameAqui = retornaTextoDoElemento(reclameAqui_path)
+    dados.append(reclameAqui)
+    
+    #Avaliacao funcionarios Glassdoor
+    avalFunc_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(2) > div > div > div.css-164r41r > span'
+    avalFunc = retornaTextoDoElemento(avalFunc_path)
+    dados.append(avalFunc)
+    
+    df_dados = pd.DataFrame(dados)
+    df_dados = df_dados.T
+    nomeColunasDataFrame = ['nome','fundacao','sede','escriturador','setor',
+                            'caracteristicas','reclameAqui','avalFunc']
+    
+    df_dados.columns = nomeColunasDataFrame
+    return df_dados
+    
+#variaveis de teste
+#codigo = codigos[0]
+codigos = codigos[0:5]
+dataframes = [] 
 
 #raspa cada site para cada codigo
 for codigo in codigos:
@@ -157,21 +165,32 @@ for codigo in codigos:
     try:
         #Da um mata leão no processo, deixa a pagina carregar meu filho
         time.sleep(1)
+        #CSS path da tabela html
+        tabela_path = '#__next > div.css-pseb0m > div.css-1yx2sea > div.css-4yg9x5 > table'
+        #espera a tabela carregar e aparecer na pagina
+        WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, tabela_path)))
+        
         #pega o html da pagina atual
         page_source = driver.page_source                                                              
         #utiliza o pandas para encontrar as tabelas do html
         #pega só a tabela com os indicadores fundamentalistas
-        df = pd.read_html(page_source)[0]
+        df_tabela = pd.read_html(page_source)[0]
+        #pega os dados que nao estao na tabela
+        df_dados = coletaDadosDaEmpresa()
         
         #coloca uma nova coluna com o codigo da empresa para identificação
-        df['codigo'] = codigo
+        df_tabela['codigo'] = codigo
+        df_dados['codigo'] = codigo
         
-        dataframes.append(df)
+        #Da um join entre os dados da tabela e os que nao estao na tabela
+        df_dados = pd.merge(df_dados, df_tabela, left_on="codigo", right_on="codigo")
         
-        
+        dataframes.append(df_dados)
         
     except:
         print("A pagina com codigo " + codigo + " nao possui tabelas!")
+        
+        
         
 #pega apenas os dataframes com o numero de colunas igual a 18 (senão da ruim na hora de unir os dfs)
 #list comprehension é uma delicinha
@@ -182,13 +201,14 @@ df_result = dfs[0]
 for i in range(1, len(dfs)):    
     df_result = dfs[i].append(df_result, ignore_index=True)
 
+
 #tratamento dos dados
 #numeros no padrão brasileiro, vamos trocar para o americano/internacional
 #df_teste=df_result.astype(int)
-df_teste = df_teste.replace('.','',regex=False)    
+#df_teste = df_teste.replace('.','',regex=False)    
 
 #salva o dataframe final em um arquivo .csv que será lido pelo Tableau
 df_result.to_csv('C:/Users/Yuri Oliveira/Desktop/BolsaDeValoresB3/resultado.csv')
 
-'''
+
 
