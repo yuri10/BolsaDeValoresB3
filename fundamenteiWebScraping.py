@@ -112,10 +112,10 @@ def coletaDadosDaEmpresa():
     sede = retornaTextoDoElemento(sede_path)
     dados.append(sede)
     
-    #Escriturador
-    escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > button'
-    escriturador = retornaTextoDoElemento(escriturador_path)
-    dados.append(escriturador)
+    #Escriturador -- Comentado por enquanto pois muda o CSS Sel. dependendo da empresa
+    #escriturador_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(4) > div:nth-child(2)'
+    #escriturador = retornaTextoDoElemento(escriturador_path)
+    #dados.append(escriturador)
     
     #Setor
     setor_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div:nth-child(5) > div.css-17maft > a'
@@ -127,19 +127,25 @@ def coletaDadosDaEmpresa():
     caracteristicas = retornaTextoDoElemento(caracteristicas_path)
     dados.append(caracteristicas)
     
-    #Avaliacao reclameAqui
-    reclameAqui_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(1) > div > div.css-164r41r > div > span.css-1dtjftk'
-    reclameAqui = retornaTextoDoElemento(reclameAqui_path)
-    dados.append(reclameAqui)
+    try:
+        #Avaliacao reclameAqui
+        reclameAqui_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(1) > div > div.css-164r41r > div > span.css-1dtjftk'
+        reclameAqui = retornaTextoDoElemento(reclameAqui_path)
+        dados.append(reclameAqui)
+    except:
+        dados.append("NA")
     
-    #Avaliacao funcionarios Glassdoor
-    avalFunc_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(2) > div > div > div.css-164r41r > span'
-    avalFunc = retornaTextoDoElemento(avalFunc_path)
-    dados.append(avalFunc)
+    try:
+        #Avaliacao funcionarios Glassdoor
+        avalFunc_path = '#__next > div.css-pseb0m > div:nth-child(1) > div > div > div.css-178yklu > div > div:nth-child(2) > div > div > div.css-164r41r > span'
+        avalFunc = retornaTextoDoElemento(avalFunc_path)
+        dados.append(avalFunc)
+    except:
+        dados.append("NA")
     
     df_dados = pd.DataFrame(dados)
     df_dados = df_dados.T
-    nomeColunasDataFrame = ['nome','fundacao','sede','escriturador','setor',
+    nomeColunasDataFrame = ['nome','fundacao','sede','setor',
                             'caracteristicas','reclameAqui','avalFunc']
     
     df_dados.columns = nomeColunasDataFrame
@@ -150,6 +156,7 @@ def coletaDadosDaEmpresa():
 codigos = codigos[0:5]
 dataframes = [] 
 
+codigo = codigos[1]
 #raspa cada site para cada codigo
 for codigo in codigos:
     
@@ -159,42 +166,44 @@ for codigo in codigos:
     driver.execute_script("window.open('"+ url + "');")
     #fecha a ultima pagina que foi utilizada
     driver.close()
-    #volta o foco do driver pra pagina que será raspada
+    #volta o foco do driver pra pagina que será raspadaz
     driver.switch_to.window(driver.window_handles[0])
     
     try:
         #Da um mata leão no processo, deixa a pagina carregar meu filho
-        time.sleep(1)
+        time.sleep(3)
         #CSS path da tabela html
         tabela_path = '#__next > div.css-pseb0m > div.css-1yx2sea > div.css-4yg9x5 > table'
         #espera a tabela carregar e aparecer na pagina
-        WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, tabela_path)))
+        #WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, tabela_path)))
         
         #pega o html da pagina atual
         page_source = driver.page_source                                                              
         #utiliza o pandas para encontrar as tabelas do html
         #pega só a tabela com os indicadores fundamentalistas
         df_tabela = pd.read_html(page_source)[0]
+    except:
+        print("A pagina com codigo " + codigo + " nao possui tabelas!")
+        
+    try:        
         #pega os dados que nao estao na tabela
         df_dados = coletaDadosDaEmpresa()
         
         #coloca uma nova coluna com o codigo da empresa para identificação
         df_tabela['codigo'] = codigo
         df_dados['codigo'] = codigo
-        
-        #Da um join entre os dados da tabela e os que nao estao na tabela
-        df_dados = pd.merge(df_dados, df_tabela, left_on="codigo", right_on="codigo")
-        
-        dataframes.append(df_dados)
-        
     except:
-        print("A pagina com codigo " + codigo + " nao possui tabelas!")
+        print("Erro na coleta dos dados da Empresa: " + codigo)
+        #Da um join entre os dados da tabela e os que nao estao na tabela
+    df_dados = pd.merge(df_dados, df_tabela, left_on="codigo", right_on="codigo")
+    dataframes.append(df_dados)
         
+    
         
         
 #pega apenas os dataframes com o numero de colunas igual a 18 (senão da ruim na hora de unir os dfs)
 #list comprehension é uma delicinha
-dfs = [df for df in dataframes if len(df.columns) == 18]    
+dfs = [df for df in dataframes if len(df.columns) == 25]    
 
 #une os dataframes das diversas empresas em um unico
 df_result = dfs[0] 
